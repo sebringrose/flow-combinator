@@ -33,7 +33,6 @@
         import React, { useState, useEffect, useRef, memo } from 'https://cdn.skypack.dev/react';
         import ReactDOM from 'https://cdn.skypack.dev/react-dom';
         import ReactFlow, { ReactFlowProvider, removeElements, Controls, Background } from 'https://cdn.skypack.dev/react-flow-renderer';
-        import FlowManager from 'https://cdn.skypack.dev/flowed';
         import Sidebar from './js/Sidebar.js';
         import nodeTypes from './js/nodeTypes.js';
         import htm from 'https://cdn.skypack.dev/htm';
@@ -70,7 +69,11 @@
                 id: `node_component_0_${initTime}`,
                 type: 'component',
                 position: { x: 250, y: 200 },
-                data: { name: "Math Thing", function: { arguments: "a,b", body: "return a+b;" } },
+                // cool thought: amount of Handles is determined by how many arguments / returns are present in component function data
+                // this would make it possible to quickly switch to a variation of a functions logic etc
+                // though might get weird if people try to call a function node in a circular fashion
+                // that's a case that needs to be handled.
+                data: { name: "Math Thing", function: { arguments: "a,b", returns: { c: "return a+b;" } } },
             },
             {
                 id: `node_comment_0_${initTime}`,

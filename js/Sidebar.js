@@ -16,7 +16,7 @@ const Sidebar = ({ nodeTypes, elements, selectedElement, onElementRemove }) => {
                         <strong>${key}:</strong> ${JSON.stringify(selectedElement[key])}
                     </li>`)}
                     <li>
-                        <button id="run-flow" onClick=${() => createFlow(elements)}>
+                        <button id="run-flow" onClick=${() => createFlow(selectedElement, elements)}>
                             Run flow
                         </button>
                     </li>

@@ -1,0 +1,47 @@
+.dndflow aside {
+    border-right: 1px solid #eee;
+    padding: 15px 10px;
+    font-size: 12px;
+    background: #fcfcfc;
+}
+.dndflow aside > * {
+    margin-bottom: 10px;
+}
+.dndflow .dndnode {
+    align-items: center;
+    border: 1px solid #1a192b;
+    border-radius: 2px;
+    cursor: grab;
+    display: flex;
+    height: 20px;
+    justify-content: center;
+    padding: 4px;
+}
+.dndflow .trigger {
+    border-color: orange;
+    color: orange;
+}
+.dndflow .data {
+    border-color: royalblue;
+    color: royalblue;
+}
+.dndflow .comment {
+    border-color: limegreen;
+    color: limegreen;
+}
+.dndflow .return {
+    border-color: darkorchid;
+    color: darkorchid;
+}
+.dndflow aside ul {
+    padding: 0;
+    margin: 0;
+}
+.dndflow aside li {
+    list-style-type: none;
+    margin-bottom: 10px;
+}
+.dndflow aside #run-flow {
+    color: red;
+    margin: auto;
+}

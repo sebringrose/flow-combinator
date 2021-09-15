@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>flowcombinator</title>
+    <style>
+        html {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        #root {
+            height: 645px;
+        }
+    </style>
+    <link rel="stylesheet" href="/css/flow.css">
+    <link rel="stylesheet" href="/css/aside.css">
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="module">
+        import React, { useState, useEffect, useRef, memo } from 'https://cdn.skypack.dev/react';
+        import ReactDOM from 'https://cdn.skypack.dev/react-dom';
+        import ReactFlow, { ReactFlowProvider, removeElements, addEdge, Controls, Background } from 'https://cdn.skypack.dev/react-flow-renderer';
+        import FlowManager from 'https://cdn.skypack.dev/flowed';
+        import Sidebar from '/js/Sidebar.js';
+        import nodeTypes from '/js/nodeTypes.js';
+        import htm from 'https://cdn.skypack.dev/htm';
+        const html = htm.bind(React.createElement);
+
+        const initialElements = [
+            {
+                id: '1',
+                type: 'trigger',
+                position: { x: 250, y: 25 },
+                data: { listener: 'onClick' },
+            },
+            {
+                id: '2',
+                type: 'data',
+                position: { x: 100, y: 100 },
+                data: { label: 'Numbers', contents: { values: [ 1, 2 ] } },
+            },
+            {
+                id: '3',
+                type: 'component',
+                position: { x: 250, y: 200 },
+                data: { name: "Math Thing", function: { arguments: "a,b", body: "return a+b;" } },
+            },
+            {
+                id: '4',
+                type: 'comment',
+                position: { x: 420, y: 210 },
+                data: { text: "<- Math Thing component sums numbers passed in from 'Numbers' data block" },
+            },
+            {
+                id: '5',
+                type: 'return',
+                position: { x: 200, y: 350 },
+                data: {},
+            },
+            { id: 'e1-2', source: '1', target: '3', animated: true },
+            { id: 'e2-3', source: '2', target: '3' },
+            { id: 'e3-5', source: '3', target: '5', animated: true },
+        ];
+
+        const Main = () => {
+            const reactFlowWrapper = useRef(null);
+            const [reactFlowInstance, setReactFlowInstance] = useState(null);
+            const [elements, setElements] = useState(initialElements);
+            const [selectedElement, setSelectedElement] = useState(null);
+            const getId = (type) => `node_${type}_${Date.now()}`;
+            const onChange = (e) => console.log(e);
+            const onElementClick = (e, element) => setSelectedElement(element);
+            const onPaneClick = (e) => setSelectedElement(null);
+            const onElementsRemove = (elementsToRemove) => setElements((els) => removeElements(elementsToRemove, els));
+            const onConnect = (params) => setElements((els) => addEdge(params, els));
+            const onLoad = (_reactFlowInstance) => setReactFlowInstance(_reactFlowInstance);
+            const onDragOver = (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; };
+            // for position updating in aside whilst dragging:
+            const onNodeDrag = (e, n) => { if (selectedElement && selectedElement.id === n.id) setSelectedElement(n) };
+            const onDrop = (e) => {
+                e.preventDefault();
+
+                const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
+                const type = e.dataTransfer.getData('application/reactflow');
+                const position = reactFlowInstance.project({
+                    x: e.clientX - reactFlowBounds.left,
+                    y: e.clientY - reactFlowBounds.top,
+                });
+                const newNode = {
+                    id: getId(type),
+                    type,
+                    position,
+                    data: { label: `${type} node` },
+                };
+
+                setElements((es) => es.concat(newNode));
+            };
+
+            return html`<main class="dndflow">
+                <${ReactFlowProvider}>
+                    <div class="reactflow-wrapper" ref=${reactFlowWrapper}>
+                        <${ReactFlow} 
+                            elements=${elements}
+                            onElementsRemove=${onElementsRemove}
+                            onConnect=${onConnect}
+                            deleteKeyCode=${8}
+                            onLoad=${onLoad}
+                            onDrop=${onDrop}
+                            onNodeDrag=${onNodeDrag}
+                            onDragOver=${onDragOver}
+                            onElementClick=${onElementClick}
+                            onPaneClick=${onPaneClick}
+                            nodeTypes=${nodeTypes}
+                        >
+                            <${Controls} />
+                            <${Background} />
+                        </${ReactFlow}>
+                    </div>
+                    <${Sidebar} nodeTypes=${nodeTypes} elements=${elements} selectedElement=${selectedElement} />
+                </${ReactFlowProvider}>
+            </main>`
+        };
+
+        ReactDOM.render(html`<${Main} />`, document.querySelector("#root"));
+    </script>
+</body>
+</html>

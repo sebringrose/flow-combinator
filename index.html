@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>flowcombinator</title>
+    <title>flow-combinator</title>
     <style>
-        html {
+        html, body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            width: 100%;
+            height: 100%;
+            margin: 0;
         }
         #root {
-            height: 645px;
+            max-height: 100%;
         }
     </style>
     <link rel="stylesheet" href="./css/flow.css">
@@ -19,62 +22,81 @@
 <body>
     <div id="root"></div>
 
+    <script>
+        // micro js script for setting #root height to viewport height
+        const fullHeightRoot = () => document.querySelector("#root").style.height = `${window.innerHeight}px`;
+        window.onload = fullHeightRoot;
+        window.onresize = fullHeightRoot;
+    </script>
+
     <script type="module">
         import React, { useState, useEffect, useRef, memo } from 'https://cdn.skypack.dev/react';
         import ReactDOM from 'https://cdn.skypack.dev/react-dom';
-        import ReactFlow, { ReactFlowProvider, removeElements, addEdge, Controls, Background } from 'https://cdn.skypack.dev/react-flow-renderer';
+        import ReactFlow, { ReactFlowProvider, removeElements, Controls, Background } from 'https://cdn.skypack.dev/react-flow-renderer';
         import FlowManager from 'https://cdn.skypack.dev/flowed';
         import Sidebar from './js/Sidebar.js';
         import nodeTypes from './js/nodeTypes.js';
         import htm from 'https://cdn.skypack.dev/htm';
         const html = htm.bind(React.createElement);
 
-        const initialElements = [
+        const createNodeID = (type, elements=[], time=null) => {
+            if (!time) time = Date.now();
+            const nodeCount = elements.filter(el => el.type === type).length
+            return `node_${type}_${nodeCount}_${time}`;
+        }
+        const addEdge = (params, elements) => [...elements, {
+            id: createNodeID("connection", elements), 
+            source: params.source, 
+            target: params.target, 
+            animated: !params.source.includes("data") 
+        }];
+
+        // hard-coded for now
+        const initTime = Date.now();
+        const initElements = [
             {
-                id: '1',
+                id: `node_trigger_0_${initTime}`,
                 type: 'trigger',
                 position: { x: 250, y: 25 },
                 data: { listener: 'onClick' },
             },
             {
-                id: '2',
+                id: `node_data_0_${initTime}`,
                 type: 'data',
                 position: { x: 100, y: 100 },
-                data: { label: 'Numbers', contents: { values: [ 1, 2 ] } },
+                data: { label: 'Numbers', contents: { a: 1, b: 2 } },
             },
             {
-                id: '3',
+                id: `node_component_0_${initTime}`,
                 type: 'component',
                 position: { x: 250, y: 200 },
                 data: { name: "Math Thing", function: { arguments: "a,b", body: "return a+b;" } },
             },
             {
-                id: '4',
+                id: `node_comment_0_${initTime}`,
                 type: 'comment',
                 position: { x: 420, y: 210 },
                 data: { text: "<- Math Thing component sums numbers passed in from 'Numbers' data block" },
             },
             {
-                id: '5',
+                id: `node_return_0_${initTime}`,
                 type: 'return',
                 position: { x: 200, y: 350 },
                 data: {},
             },
-            { id: 'e1-2', source: '1', target: '3', animated: true },
-            { id: 'e2-3', source: '2', target: '3' },
-            { id: 'e3-5', source: '3', target: '5', animated: true },
+            { id: `node_connection_0_${initTime}`, source: `node_trigger_0_${initTime}`, target: `node_component_0_${initTime}`, animated: true },
+            { id: `node_connection_1_${initTime}`, source: `node_data_0_${initTime}`, target: `node_component_0_${initTime}` },
+            { id: `node_connection_2_${initTime}`, source: `node_component_0_${initTime}`, target: `node_return_0_${initTime}`, animated: true },
         ];
 
         const Main = () => {
             const reactFlowWrapper = useRef(null);
             const [reactFlowInstance, setReactFlowInstance] = useState(null);
-            const [elements, setElements] = useState(initialElements);
+            const [elements, setElements] = useState(initElements);
             const [selectedElement, setSelectedElement] = useState(null);
-            const getId = (type) => `node_${type}_${Date.now()}`;
-            const onChange = (e) => console.log(e);
             const onElementClick = (e, element) => setSelectedElement(element);
             const onPaneClick = (e) => setSelectedElement(null);
-            const onElementsRemove = (elementsToRemove) => setElements((els) => removeElements(elementsToRemove, els));
+            const onElementsRemove = (elementsToRemove) => { setElements((els) => removeElements(elementsToRemove, els)); setSelectedElement(null) }
             const onConnect = (params) => setElements((els) => addEdge(params, els));
             const onLoad = (_reactFlowInstance) => setReactFlowInstance(_reactFlowInstance);
             const onDragOver = (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; };
@@ -90,14 +112,21 @@
                     y: e.clientY - reactFlowBounds.top,
                 });
                 const newNode = {
-                    id: getId(type),
+                    id: createNodeID(type),
                     type,
                     position,
                     data: { label: `${type} node` },
                 };
 
                 setElements((es) => es.concat(newNode));
+                setSelectedElement(newNode);
             };
+
+            // probs a more efficient way to do this but effect might come in handy l8r
+            useEffect(() => {
+                // get all connections
+                console.log(elements);
+            }, [elements])
 
             return html`<main class="dndflow">
                 <${ReactFlowProvider}>
@@ -119,7 +148,7 @@
                             <${Background} />
                         </${ReactFlow}>
                     </div>
-                    <${Sidebar} nodeTypes=${nodeTypes} elements=${elements} selectedElement=${selectedElement} />
+                    <${Sidebar} nodeTypes=${nodeTypes} elements=${elements} selectedElement=${selectedElement} onElementRemove=${onElementsRemove} />
                 </${ReactFlowProvider}>
             </main>`
         };

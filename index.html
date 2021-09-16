@@ -95,7 +95,8 @@
         const Main = () => {
             const reactFlowWrapper = useRef(null);
             const [reactFlowInstance, setReactFlowInstance] = useState(null);
-            const [elements, setElements] = useState(initElements);
+            const localElements = localStorage.getItem("elements")
+            const [elements, setElements] = useState(localElements ? JSON.parse(localElements) : initElements);
             const [selectedElement, setSelectedElement] = useState(null);
             const onElementClick = (e, element) => setSelectedElement(element);
             const onPaneClick = (e) => setSelectedElement(null);
@@ -125,10 +126,9 @@
                 setSelectedElement(newNode);
             };
 
-            // probs a more efficient way to do this but effect might come in handy l8r
+            // localStorage for faster debugging & general usefulness
             useEffect(() => {
-                // get all connections
-                console.log(elements);
+                localStorage.setItem("elements", JSON.stringify(elements));
             }, [elements])
 
             return html`<main class="dndflow">

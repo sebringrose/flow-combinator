@@ -4,7 +4,7 @@ import {
 } from 'https://cdn.skypack.dev/react-flow-renderer';
 import FlowManager from 'https://cdn.skypack.dev/flowed';
 
-// take elements state from react-flow, read to create resolvers and JSON flow object
+// take elements state from react-flow, read to create resolvers and FlowManager tasks JSON
 export const createFlow = (selectedElement, elements) => {
     const components = [];
     const tasks = {};
@@ -12,7 +12,8 @@ export const createFlow = (selectedElement, elements) => {
     const recursivelyPushComponents = (element, sorter=0) => {
         const el = element;
 
-        // get neighbours and call fcn for them, increment or decrement sorter for ordering of components
+        // get neighbours and call fcn for them, 
+        // increment or decrement sorter for ordering of components
         const incomers = getIncomers(el, elements);
         incomers.forEach(incomer => {
             if (incomer.type === "data") {

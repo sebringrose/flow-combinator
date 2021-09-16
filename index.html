@@ -96,7 +96,9 @@
             const reactFlowWrapper = useRef(null);
             const [reactFlowInstance, setReactFlowInstance] = useState(null);
             const localElements = localStorage.getItem("elements")
-            const [elements, setElements] = useState(localElements ? JSON.parse(localElements) : initElements);
+                ? JSON.parse(localStorage.getItem("elements"))
+                : [];
+            const [elements, setElements] = useState(localElements[0] ? localElements : initElements);
             const [selectedElement, setSelectedElement] = useState(null);
             const onElementClick = (e, element) => setSelectedElement(element);
             const onPaneClick = (e) => setSelectedElement(null);

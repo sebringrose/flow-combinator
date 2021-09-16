@@ -23,8 +23,8 @@
     padding: 4px;
 }
 .dndflow .trigger {
-    border-color: orange;
-    color: orange;
+    border-color: darkorange;
+    color: darkorange;
 }
 .dndflow .data {
     border-color: royalblue;
@@ -35,8 +35,8 @@
     color: limegreen;
 }
 .dndflow .return {
-    border-color: darkorchid;
-    color: darkorchid;
+    border-color: mediumorchid;
+    color: mediumorchid;
 }
 .dndflow aside ul {
     padding: 0;

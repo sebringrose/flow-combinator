@@ -17,6 +17,31 @@
         max-width: 180px;
     }
 }
+.react-flow__handle::before {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    width: 250%;
+    height: 250%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index:-1;
+}
+.react-flow__edge::before {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    width: 150%;
+    height: 150%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index:-1;
+}
+.react-flow__handle:hover {
+    background-color: #23a3f9;
+}
 .react-flow__node {
     border-radius: 3px;
     border-style: solid;
@@ -38,8 +63,8 @@
     color: #222;
 }
 .react-flow__node-trigger {
-    border-color: orange;
-    color: orange;
+    border-color: darkorange;
+    color: darkorange;
 }
 .react-flow__node-data {
     border-color: royalblue;
@@ -51,6 +76,6 @@
     color: limegreen;
 }
 .react-flow__node-return {
-    border-color: orchid;
-    color: orchid;
+    border-color: mediumorchid;
+    color: mediumorchid;
 }

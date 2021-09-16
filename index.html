@@ -108,6 +108,12 @@
             const onDragOver = (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; };
             // for position updating in aside whilst dragging:
             const onNodeDrag = (e, n) => { if (selectedElement && selectedElement.id === n.id) setSelectedElement(n) };
+            // for catching and saving element repositions (nested object changes to elements array doesn't trigger useEffect below)
+            const onNodeDragStop = (e, n) => {
+                const newEls = elements;
+                newEls[newEls.findIndex(el => el.id === n.id)] = n;
+                localStorage.setItem("elements", JSON.stringify(elements));
+            }
             const onDrop = (e) => {
                 e.preventDefault();
 
@@ -144,6 +150,7 @@
                             onLoad=${onLoad}
                             onDrop=${onDrop}
                             onNodeDrag=${onNodeDrag}
+                            onNodeDragStop=${onNodeDragStop}
                             onDragOver=${onDragOver}
                             onElementClick=${onElementClick}
                             onPaneClick=${onPaneClick}

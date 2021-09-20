@@ -92,6 +92,11 @@
             { id: `node_connection_1_${initTime}`, source: `node_data_0_${initTime}`, target: `node_component_0_${initTime}` },
             { id: `node_connection_2_${initTime}`, source: `node_component_0_${initTime}`, target: `node_return_0_${initTime}`, animated: true },
         ];
+        const initFlows = [
+            {
+
+            }
+        ];
 
         const Main = () => {
             const reactFlowWrapper = useRef(null);
@@ -99,12 +104,12 @@
             const localElements = localStorage.getItem("elements")
                 ? JSON.parse(localStorage.getItem("elements"))
                 : [];
+            const [elements, setElements] = useState(localElements[0] ? localElements : initElements);    
             const localFlows = localStorage.getItem("flows")
                 ? JSON.parse(localStorage.getItem("flows"))
                 : [];
-            // bring in local history with this? https://www.npmjs.com/package/use-undo
-            const [elements, setElements] = useState(localElements[0] ? localElements : initElements);
             const [flows, setFlows] = useState(localFlows[0] ? localFlows : []);
+            // bring in local elements history with this? https://www.npmjs.com/package/use-undo
             // flows and elements to be backed up on firebase and versioned there
             const [selectedElement, setSelectedElement] = useState(null);
             const onElementClick = (e, element) => setSelectedElement(element);
@@ -115,7 +120,7 @@
                 
                 const newEls = addEdge(params, elements);
                 setElements(newEls);
-                return onConnectUpdateFlows(elements.find(el => el.id === params.target), newEls, setElements, flows, setFlows);
+                return onConnectUpdateFlows(elements.find(el => el.id === params.target), newEls, flows, setFlows);
             };
             const onLoad = (_reactFlowInstance) => setReactFlowInstance(_reactFlowInstance);
             const onDragOver = (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; };
@@ -156,6 +161,17 @@
             useEffect(() => {
                 console.log(flows);
                 localStorage.setItem("flows", JSON.stringify(flows));
+
+                // add flowID to elements in state for rendering in UI
+                setElements(els => 
+                    els.map(el => {
+                        const elFlow = flows.find(flow => flow.elementIDs.includes(el.id));
+                        if (elFlow && elFlow.id && elFlow.name) {
+                            el.data.flow = elFlow;
+                        } else if (el.data && el.data.flow) delete el.data.flow;
+                        return el;
+                    })
+                )
             }, [flows])
 
             return html`<main class="dndflow">

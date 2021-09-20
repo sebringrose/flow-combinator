@@ -53,6 +53,7 @@ export const onConnectUpdateFlows = (selectedElement, elements, flows, setFlows)
         elementIDs.push(cmpnt.el.id);
         console.log(flowID);
         cmpnt.el.data.flowID = flowID;
+        // A, B, C... keys for tasks
         tasks[String.fromCharCode(65+i)] = cmpnt.el;
     });
 
@@ -60,11 +61,23 @@ export const onConnectUpdateFlows = (selectedElement, elements, flows, setFlows)
         const index = flows.findIndex(flow => flow.id === flowID);
         const flowData = { id: flowID, elementIDs, tasks };
         if (index > -1) {
-            flows[i] = flowData;
+            flows[index] = flowData;
         } else flows.push(flowData);
         return [...flows];
     });
-}
+};
+
+export const onRemoveUpdateFlows = (newEls, setFlows) => {
+    setFlows(flows => {
+        let newFlows = flows.map(flow => {
+            if (!newEls.some(el => el.data && el.data.flowID === flow.id)) return undefined;
+            flow.elementIDs.filter(elID => newEls.some(el => el.id === elID));
+            return flow
+        })
+        newFlows = newFlows.filter(flow => flow);
+        return newFlows;
+    });
+};
 
 // var f = new Function(function.inputs, function.body);
 

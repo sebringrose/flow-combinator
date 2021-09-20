@@ -35,7 +35,7 @@
         import ReactFlow, { ReactFlowProvider, removeElements, Controls, Background } from 'https://cdn.skypack.dev/react-flow-renderer';
         import Sidebar from './js/Sidebar.js';
         import nodeTypes from './js/nodeTypes.js';
-        import { onConnectUpdateFlows } from './js/flows.js';
+        import { onConnectUpdateFlows, onRemoveUpdateFlows } from './js/flows.js';
         import htm from 'https://cdn.skypack.dev/htm';
         const html = htm.bind(React.createElement);
 
@@ -92,29 +92,22 @@
             { id: `node_connection_1_${initTime}`, source: `node_data_0_${initTime}`, target: `node_component_0_${initTime}` },
             { id: `node_connection_2_${initTime}`, source: `node_component_0_${initTime}`, target: `node_return_0_${initTime}`, animated: true },
         ];
-        const initFlows = [
-            {
-
-            }
-        ];
 
         const Main = () => {
             const reactFlowWrapper = useRef(null);
             const [reactFlowInstance, setReactFlowInstance] = useState(null);
-            const localElements = localStorage.getItem("elements")
-                ? JSON.parse(localStorage.getItem("elements"))
-                : [];
+            const localElements = localStorage.getItem("elements") ? JSON.parse(localStorage.getItem("elements")) : [];
             const [elements, setElements] = useState(localElements[0] ? localElements : initElements);    
-            const localFlows = localStorage.getItem("flows")
-                ? JSON.parse(localStorage.getItem("flows"))
-                : [];
+            const localFlows = localStorage.getItem("flows") ? JSON.parse(localStorage.getItem("flows")) : [];
             const [flows, setFlows] = useState(localFlows[0] ? localFlows : []);
             // bring in local elements history with this? https://www.npmjs.com/package/use-undo
             // flows and elements to be backed up on firebase and versioned there
             const [selectedElement, setSelectedElement] = useState(null);
+
+            const onLoad = (_reactFlowInstance) => setReactFlowInstance(_reactFlowInstance);
             const onElementClick = (e, element) => setSelectedElement(element);
             const onPaneClick = (e) => setSelectedElement(null);
-            const onElementsRemove = (elementsToRemove) => { setElements((els) => removeElements(elementsToRemove, els)); setSelectedElement(null) }
+
             const onConnect = (params) => {
                 // this to be extended to reject connection if: same node, node is above in flow, component connection across flows
                 
@@ -122,7 +115,13 @@
                 setElements(newEls);
                 return onConnectUpdateFlows(elements.find(el => el.id === params.target), newEls, flows, setFlows);
             };
-            const onLoad = (_reactFlowInstance) => setReactFlowInstance(_reactFlowInstance);
+            const onElementsRemove = (elementsToRemove) => { 
+                const newEls = removeElements(elementsToRemove, elements);
+                setElements(newEls); 
+                setSelectedElement(null);
+                return onRemoveUpdateFlows(newEls, setFlows);
+            };
+
             const onDragOver = (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; };
             // for position updating in aside whilst dragging:
             const onNodeDrag = (e, n) => { if (selectedElement && selectedElement.id === n.id) setSelectedElement(n) };
@@ -131,7 +130,7 @@
                 const newEls = elements;
                 newEls[newEls.findIndex(el => el.id === n.id)] = n;
                 localStorage.setItem("elements", JSON.stringify(elements));
-            }
+            };
             const onDrop = (e) => {
                 e.preventDefault();
 
@@ -156,7 +155,7 @@
             useEffect(() => {
                 console.log(elements);
                 localStorage.setItem("elements", JSON.stringify(elements));
-            }, [elements])
+            }, [elements]);
 
             useEffect(() => {
                 console.log(flows);
@@ -167,12 +166,12 @@
                     els.map(el => {
                         const elFlow = flows.find(flow => flow.elementIDs.includes(el.id));
                         if (elFlow && elFlow.id && elFlow.name) {
-                            el.data.flow = elFlow;
+                            el.data = { ...el.data, flow: elFlow };
                         } else if (el.data && el.data.flow) delete el.data.flow;
                         return el;
                     })
                 )
-            }, [flows])
+            }, [flows, setElements]);
 
             return html`<main class="dndflow">
                 <${ReactFlowProvider}>

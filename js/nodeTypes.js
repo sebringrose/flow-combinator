@@ -34,6 +34,7 @@ const ComponentNode = memo(({ data, isConnectable }) => html`<${React.Fragment}>
         isConnectable=${isConnectable}
     />
     <div class="react-flow__node__inner">
+        <h6>${data.flowID}</h6>
         <h5>Component</h5>
         <p>${data.name}</p>
     </div>

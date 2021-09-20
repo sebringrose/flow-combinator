@@ -35,6 +35,7 @@
         import ReactFlow, { ReactFlowProvider, removeElements, Controls, Background } from 'https://cdn.skypack.dev/react-flow-renderer';
         import Sidebar from './js/Sidebar.js';
         import nodeTypes from './js/nodeTypes.js';
+        import { onConnectUpdateFlows } from './js/flows.js';
         import htm from 'https://cdn.skypack.dev/htm';
         const html = htm.bind(React.createElement);
 
@@ -98,12 +99,24 @@
             const localElements = localStorage.getItem("elements")
                 ? JSON.parse(localStorage.getItem("elements"))
                 : [];
+            const localFlows = localStorage.getItem("flows")
+                ? JSON.parse(localStorage.getItem("flows"))
+                : [];
+            // bring in local history with this? https://www.npmjs.com/package/use-undo
             const [elements, setElements] = useState(localElements[0] ? localElements : initElements);
+            const [flows, setFlows] = useState(localFlows[0] ? localFlows : []);
+            // flows and elements to be backed up on firebase and versioned there
             const [selectedElement, setSelectedElement] = useState(null);
             const onElementClick = (e, element) => setSelectedElement(element);
             const onPaneClick = (e) => setSelectedElement(null);
             const onElementsRemove = (elementsToRemove) => { setElements((els) => removeElements(elementsToRemove, els)); setSelectedElement(null) }
-            const onConnect = (params) => setElements((els) => addEdge(params, els));
+            const onConnect = (params) => {
+                // this to be extended to reject connection if: same node, node is above in flow, component connection across flows
+                
+                const newEls = addEdge(params, elements);
+                setElements(newEls);
+                return onConnectUpdateFlows(elements.find(el => el.id === params.target), newEls, setElements, flows, setFlows);
+            };
             const onLoad = (_reactFlowInstance) => setReactFlowInstance(_reactFlowInstance);
             const onDragOver = (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; };
             // for position updating in aside whilst dragging:
@@ -136,8 +149,14 @@
 
             // localStorage for faster debugging & general usefulness
             useEffect(() => {
+                console.log(elements);
                 localStorage.setItem("elements", JSON.stringify(elements));
             }, [elements])
+
+            useEffect(() => {
+                console.log(flows);
+                localStorage.setItem("flows", JSON.stringify(flows));
+            }, [flows])
 
             return html`<main class="dndflow">
                 <${ReactFlowProvider}>

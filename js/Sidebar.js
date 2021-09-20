@@ -1,5 +1,4 @@
 import React from 'https://cdn.skypack.dev/react';
-import { createFlow } from './flowed.js';
 import htm from 'https://cdn.skypack.dev/htm';
 const html = htm.bind(React.createElement);
 
@@ -16,7 +15,7 @@ const Sidebar = ({ nodeTypes, elements, selectedElement, onElementRemove }) => {
                         <strong>${key}:</strong> ${JSON.stringify(selectedElement[key])}
                     </li>`)}
                     <li>
-                        <button id="run-flow" onClick=${() => createFlow(selectedElement, elements)}>
+                        <button id="run-flow" onClick=${() => console.log(selectedElement, elements)}>
                             Run flow
                         </button>
                     </li>

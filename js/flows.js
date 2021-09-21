@@ -42,15 +42,15 @@ export const onConnectUpdateFlows = (selectedElement, elements, flows, setFlows)
 
     // create tasks obj, element IDs array & resolvers obj for flow
     // push result into flows array state var/update if flow already exists
-    const elementIDs = [];
+    const componentIDs = [];
     const tasks = {};
     const elWithFlowID = components.find(cmpnt => cmpnt.el.data.flowID);
-    const flowID = elWithFlowID && elWithFlowID.data && elWithFlowID.data.flowID
-        ? elWithFlowID.data.flowID
+    const flowID = elWithFlowID && elWithFlowID.el.data && elWithFlowID.el.data.flowID
+        ? elWithFlowID.el.data.flowID
         : `flow-${flows.length}`;
 
     components.forEach((cmpnt, i) => {
-        elementIDs.push(cmpnt.el.id);
+        componentIDs.push(cmpnt.el.id);
         console.log(flowID);
         cmpnt.el.data.flowID = flowID;
         // A, B, C... keys for tasks
@@ -59,7 +59,7 @@ export const onConnectUpdateFlows = (selectedElement, elements, flows, setFlows)
 
     setFlows(flows => {
         const index = flows.findIndex(flow => flow.id === flowID);
-        const flowData = { id: flowID, elementIDs, tasks };
+        const flowData = { id: flowID, componentIDs, tasks };
         if (index > -1) {
             flows[index] = flowData;
         } else flows.push(flowData);
@@ -67,18 +67,15 @@ export const onConnectUpdateFlows = (selectedElement, elements, flows, setFlows)
     });
 };
 
-export const onRemoveUpdateFlows = (newEls, setFlows) => {
+export const onRemoveUpdateFlows = (elsRemoved, newEls, setFlows) => {
+    console.log(elsRemoved);
     setFlows(flows => {
-        let newFlows = flows.map(flow => {
-            if (!newEls.some(el => el.data && el.data.flowID === flow.id)) return undefined;
-            flow.elementIDs.filter(elID => newEls.some(el => el.id === elID));
-            return flow
-        })
-        newFlows = newFlows.filter(flow => flow);
+        let newFlows = flows.filter(flow => newEls.some(el => el.data && el.data.flowID === flow.id));
+        newFlows.forEach(flow => flow.componentIDs = flow.componentIDs.filter(elID => {
+            return newEls.some(el => el.id === elID) && !elsRemoved.some(el => el.target === elID);
+        }));
         return newFlows;
     });
 };
 
 // var f = new Function(function.inputs, function.body);
-
-// need another function that will remove flowID from elements if they are disconnected from a flow

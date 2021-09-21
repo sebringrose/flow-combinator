@@ -119,7 +119,7 @@
                 const newEls = removeElements(elementsToRemove, elements);
                 setElements(newEls); 
                 setSelectedElement(null);
-                return onRemoveUpdateFlows(newEls, setFlows);
+                return onRemoveUpdateFlows(elementsToRemove, newEls, setFlows);
             };
 
             const onDragOver = (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; };
@@ -141,10 +141,10 @@
                     y: e.clientY - reactFlowBounds.top,
                 });
                 const newNode = {
-                    id: createNodeID(type),
+                    id: createNodeID(type, elements),
                     type,
                     position,
-                    data: { label: `${type} node` },
+                    data: {},
                 };
 
                 setElements((es) => es.concat(newNode));
@@ -164,10 +164,13 @@
                 // add flowID to elements in state for rendering in UI
                 setElements(els => 
                     els.map(el => {
-                        const elFlow = flows.find(flow => flow.elementIDs.includes(el.id));
-                        if (elFlow && elFlow.id && elFlow.name) {
-                            el.data = { ...el.data, flow: elFlow };
-                        } else if (el.data && el.data.flow) delete el.data.flow;
+                        const elFlow = flows.find(flow => flow.componentIDs.includes(el.id));
+                        if (elFlow && elFlow.id) {
+                            el.data = { ...el.data, flowID: elFlow.id };
+                        } else if (el.data && el.data.flowID) {
+                            delete el.data.flowID;
+                            el.data = { ...el.data };
+                        }
                         return el;
                     })
                 )

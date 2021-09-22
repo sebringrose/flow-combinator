@@ -37,26 +37,28 @@ export const onConnectUpdateFlows = (selectedElement, elements, flows, setFlows)
     recursivelyPushComponents(selectedElement);
     components.sort((a,b) => a.sorter > b.sorter);
 
-    // YAYYY this works!
-    console.log(components);
-
     // create tasks obj, element IDs array & resolvers obj for flow
-    // push result into flows array state var/update if flow already exists
-    const componentIDs = [];
-    const tasks = {};
     const elWithFlowID = components.find(cmpnt => cmpnt.el.data.flowID);
     const flowID = elWithFlowID && elWithFlowID.el.data && elWithFlowID.el.data.flowID
         ? elWithFlowID.el.data.flowID
         : `flow-${flows.length}`;
 
+    const componentIDs = [];
+    const tasks = {};
     components.forEach((cmpnt, i) => {
         componentIDs.push(cmpnt.el.id);
-        console.log(flowID);
         cmpnt.el.data.flowID = flowID;
-        // A, B, C... keys for tasks
-        tasks[String.fromCharCode(65+i)] = cmpnt.el;
+        // this will need to use previous component & inbound elements to figure out what the "requires" array will contain
+        // and which input is each require, also input nodes will have to have have there data written in params?
+        tasks[cmpnt.el.data.resolver.name] = {
+            requires: "this will be calc'ed from inputs",
+            // resolver contains function data in string form. Will need to be decoded before flow execution
+            resolver: cmpnt.el.data.resolver,
+            results: cmpnt.el.data.results,
+        };
     });
 
+    // push result into flows array state var/update if flow already exists
     setFlows(flows => {
         const index = flows.findIndex(flow => flow.id === flowID);
         const flowData = { id: flowID, componentIDs, tasks };
@@ -68,7 +70,6 @@ export const onConnectUpdateFlows = (selectedElement, elements, flows, setFlows)
 };
 
 export const onRemoveUpdateFlows = (elsRemoved, newEls, setFlows) => {
-    console.log(elsRemoved);
     setFlows(flows => {
         let newFlows = flows.filter(flow => newEls.some(el => el.data && el.data.flowID === flow.id));
         newFlows.forEach(flow => flow.componentIDs = flow.componentIDs.filter(elID => {

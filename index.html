@@ -14,6 +14,7 @@
         }
         #root {
             max-height: 100%;
+            min-height: 600px;
         }
     </style>
     <link rel="stylesheet" href="./css/flow.css">
@@ -74,7 +75,18 @@
                 // this would make it possible to quickly switch to a variation of a functions logic etc
                 // though might get weird if people try to call a function node in a circular fashion
                 // that's a case that needs to be handled.
-                data: { name: "Math Thing", function: { arguments: "a,b", returns: { c: "return a+b;" } } },
+                data: { 
+                    name: "Math Thing",
+                    resolver: { 
+                        name: "mathThing", 
+                        params: {}, 
+                        arguments: ["a", "b"], 
+                        function: "return a+b;"
+                    },
+                    results: {
+                        [`node_component_0_${initTime}`]: `node_component_0_${initTime}`
+                    }
+                },
             },
             {
                 id: `node_comment_0_${initTime}`,

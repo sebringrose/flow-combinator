@@ -27,12 +27,13 @@ const TriggerNode = memo(({ data, isConnectable }) => html`<${React.Fragment}>
     />
 </${React.Fragment}>`);
 
-const ComponentNode = memo(({ data, isConnectable }) => html`<${React.Fragment}>
-    <${Handle}
-        type="target"
-        position="top"
-        isConnectable=${isConnectable}
-    />
+const ComponentNode = memo(({ id, data, isConnectable }) => html`<${React.Fragment}>
+    ${data.resolver.arguments.map((arg, i) =>  html`<${Handle}
+            id=${id + arg}
+            type="target"
+            isConnectable=${isConnectable}
+            style=${{ left: `${(100/(data.resolver.arguments.length+1)) * (i+1)}%` }}
+        />`)}
     <div class="react-flow__node__inner">
         <h6>${data.flowID}</h6>
         <h5>Component</h5>

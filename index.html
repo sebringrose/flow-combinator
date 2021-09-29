@@ -46,9 +46,8 @@
             return `node_${type}_${nodeCount}_${time}`;
         }
         const addEdge = (params, elements) => [...elements, {
+            ...params,
             id: createNodeID("connection", elements), 
-            source: params.source, 
-            target: params.target, 
             animated: !params.source.includes("data") 
         }];
 

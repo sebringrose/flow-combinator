@@ -61,10 +61,39 @@ const CommentNode = memo(({ data }) => html`<div class="react-flow__node__inner"
     // ${data.text}
 </div>`);
 
-export default {
+export const nodeTypes = {
     comment: CommentNode,
     component: ComponentNode,
     data: DataNode,
     return: ReturnNode,
     trigger: TriggerNode,
+};
+
+export const nodeTemplates = {
+    comment: {
+        data: {}
+    },
+    component: {
+        data: {
+            name: "Does Something...",
+            resolver: { 
+                name: "generic", 
+                params: {}, 
+                arguments: ["a"], 
+                function: "return a;"
+            },
+            results: {
+                [`generic`]: `generic`
+            }
+        }
+    },
+    data: {
+        data: {}
+    },
+    return: {
+        data: {}
+    },
+    trigger: {
+        data: {}
+    },
 };

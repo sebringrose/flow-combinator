@@ -1,10 +1,12 @@
 import React from 'https://cdn.skypack.dev/react';
 import htm from 'https://cdn.skypack.dev/htm';
+import { nodeTypes, nodeTemplates } from './nodeTypes.js'
 const html = htm.bind(React.createElement);
 
-const Sidebar = ({ nodeTypes, elements, selectedElement, onElementRemove }) => {
-    const onDragStart = (event, nodeType) => {
-        event.dataTransfer.setData('application/reactflow', nodeType);
+const Sidebar = ({ elements, selectedElement, onElementRemove }) => {
+    const onDragStart = (event, type) => {
+        const nodeObj = { ...nodeTemplates[type], type };
+        event.dataTransfer.setData('application/reactflow', JSON.stringify({ ...nodeObj, type }));
         event.dataTransfer.effectAllowed = 'move';
     };
 

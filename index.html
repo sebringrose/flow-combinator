@@ -35,7 +35,7 @@
         import ReactDOM from 'https://cdn.skypack.dev/react-dom';
         import ReactFlow, { ReactFlowProvider, removeElements, Controls, Background } from 'https://cdn.skypack.dev/react-flow-renderer';
         import Sidebar from './js/Sidebar.js';
-        import nodeTypes from './js/nodeTypes.js';
+        import { nodeTypes } from './js/nodeTypes.js';
         import { onConnectUpdateFlows, onRemoveUpdateFlows } from './js/flows.js';
         import htm from 'https://cdn.skypack.dev/htm';
         const html = htm.bind(React.createElement);
@@ -146,16 +146,16 @@
                 e.preventDefault();
 
                 const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-                const type = e.dataTransfer.getData('application/reactflow');
+                const nodeObj = JSON.parse(e.dataTransfer.getData('application/reactflow'));
                 const position = reactFlowInstance.project({
                     x: e.clientX - reactFlowBounds.left,
                     y: e.clientY - reactFlowBounds.top,
                 });
                 const newNode = {
-                    id: createNodeID(type, elements),
-                    type,
+                    id: createNodeID(nodeObj.type, elements),
+                    type: nodeObj.type,
                     position,
-                    data: {},
+                    data: nodeObj.data,
                 };
 
                 setElements((es) => es.concat(newNode));
@@ -208,7 +208,7 @@
                             <${Background} />
                         </${ReactFlow}>
                     </div>
-                    <${Sidebar} nodeTypes=${nodeTypes} elements=${elements} selectedElement=${selectedElement} onElementRemove=${onElementsRemove} />
+                    <${Sidebar} elements=${elements} selectedElement=${selectedElement} onElementRemove=${onElementsRemove} />
                 </${ReactFlowProvider}>
             </main>`
         };

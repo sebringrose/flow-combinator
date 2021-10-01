@@ -17,17 +17,6 @@
         max-width: 180px;
     }
 }
-.react-flow__handle::before {
-    content: '';
-    position: absolute;
-    border-radius: 50%;
-    width: 250%;
-    height: 250%;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    z-index:-1;
-}
 .react-flow__edge::before {
     content: '';
     position: absolute;
@@ -39,8 +28,23 @@
     transform: translate(-50%, -50%);
     z-index:-1;
 }
+.react-flow__handle::before {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    width: 250%;
+    height: 250%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index:-1;
+}
+.react-flow__handle {
+    color: transparent;
+}
 .react-flow__handle:hover {
     background-color: #23a3f9;
+    color: inherit;
 }
 .react-flow__node {
     border-radius: 3px;

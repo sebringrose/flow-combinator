@@ -3,16 +3,20 @@ import { Handle } from 'https://cdn.skypack.dev/react-flow-renderer';
 import htm from 'https://cdn.skypack.dev/htm';
 const html = htm.bind(React.createElement);
 
-const DataNode = memo(({ data, isConnectable }) => html`<${React.Fragment}>
+const DataNode = memo(({ id, data, isConnectable }) => html`<${React.Fragment}>
     <div class="react-flow__node__inner">
         <h5>Data</h5>
         <p>${data.label}</p>
     </div>
-    <${Handle}
+    ${Object.keys(data.contents).map((dataKey, i) => html`<${Handle}
+        id=${`${id}_${dataKey}`}
         type="source"
-        position="bottom"
         isConnectable=${isConnectable}
-    />
+        position="bottom"
+        style=${{ left: `${(100/(Object.keys(data.contents).length+1)) * (i+1)}%` }}
+    >
+        ${dataKey}
+    </${Handle}>`)}
 </${React.Fragment}>`);
 
 const TriggerNode = memo(({ data, isConnectable }) => html`<${React.Fragment}>
@@ -33,17 +37,22 @@ const ComponentNode = memo(({ id, data, isConnectable }) => html`<${React.Fragme
         type="target"
         isConnectable=${isConnectable}
         style=${{ left: `${(100/(data.resolver.arguments.length+1)) * (i+1)}%` }}
-    />`)}
+    >
+        ${arg}
+    </${Handle}>`)}
     <div class="react-flow__node__inner">
         <h6>${data.flowID}</h6>
         <h5>Component</h5>
         <p>${data.name}</p>
     </div>
-    <${Handle}
+    ${data.provides.map((providedVar, i) => html`<${Handle}
         type="source"
         position="bottom"
         isConnectable=${isConnectable}
-    />
+        style=${{ left: `${(100/(data.provides.length+1)) * (i+1)}%` }}
+    >
+        ${providedVar}
+    </${Handle}>`)}
 </${React.Fragment}>`);
 
 const ReturnNode = memo(({ data, isConnectable }) => html`<${React.Fragment}>
@@ -79,10 +88,10 @@ export const nodeTemplates = {
             resolver: { 
                 name: "generic", 
                 params: {}, 
-                arguments: ["a"], 
+                arguments: ["a1"], 
                 function: "return a;"
             },
-            results: {}
+            provides: ["a2"]
         }
     },
     data: {

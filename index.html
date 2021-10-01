@@ -48,7 +48,7 @@
         const addEdge = (params, elements) => [...elements, {
             ...params,
             id: createNodeID("connection", elements), 
-            animated: !params.source.includes("data") 
+            animated: params.source.includes("trigger") || params.source.includes("trigger")
         }];
 
         // hard-coded for now
@@ -82,9 +82,7 @@
                         arguments: ["a", "b"], 
                         function: "return a+b;"
                     },
-                    results: {
-                        [`node_component_0_${initTime}`]: `node_component_0_${initTime}`
-                    }
+                    provides: ["c"]
                 },
             },
             {
@@ -120,8 +118,9 @@
             const onPaneClick = (e) => setSelectedElement(null);
 
             const onConnect = (params) => {
-                // this to be extended to reject connection if: same node, node is above in flow, component connection across flows
-                
+                // this might need to be extended to reject connection if node is above in flow
+                if (params.source === params.target) return null;
+
                 const newEls = addEdge(params, elements);
                 setElements(newEls);
                 return onConnectUpdateFlows(elements.find(el => el.id === params.target), newEls, flows, setFlows);

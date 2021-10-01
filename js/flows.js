@@ -54,7 +54,7 @@ export const onConnectUpdateFlows = (selectedElement, elements, flows, setFlows)
             requires: "this will be calc'ed from inputs",
             // resolver contains function data in string form. Will need to be decoded before flow execution
             resolver: cmpnt.el.data.resolver,
-            results: cmpnt.el.data.results,
+            provides: cmpnt.el.data.provides,
         };
     });
 

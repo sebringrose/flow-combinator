@@ -151,8 +151,11 @@
                     x: e.clientX - reactFlowBounds.left,
                     y: e.clientY - reactFlowBounds.top,
                 });
+                const id = createNodeID(nodeObj.type, elements);
+                if (nodeObj.type === "component") nodeObj.data.results = { id };
+
                 const newNode = {
-                    id: createNodeID(nodeObj.type, elements),
+                    id: id,
                     type: nodeObj.type,
                     position,
                     data: nodeObj.data,

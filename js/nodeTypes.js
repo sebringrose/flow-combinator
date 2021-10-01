@@ -82,9 +82,7 @@ export const nodeTemplates = {
                 arguments: ["a"], 
                 function: "return a;"
             },
-            results: {
-                [`generic`]: `generic`
-            }
+            results: {}
         }
     },
     data: {

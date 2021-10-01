@@ -50,7 +50,7 @@ export const onConnectUpdateFlows = (selectedElement, elements, flows, setFlows)
         cmpnt.el.data.flowID = flowID;
         // this will need to use previous component & inbound elements to figure out what the "requires" array will contain
         // and which input is each require, also input nodes will have to have have there data written in params?
-        tasks[cmpnt.el.data.resolver.name] = {
+        tasks[cmpnt.el.id] = {
             requires: "this will be calc'ed from inputs",
             // resolver contains function data in string form. Will need to be decoded before flow execution
             resolver: cmpnt.el.data.resolver,

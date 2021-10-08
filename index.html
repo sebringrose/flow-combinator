@@ -58,28 +58,55 @@
                 id: `node_trigger_0_${initTime}`,
                 type: 'trigger',
                 position: { x: 250, y: 25 },
-                data: { listener: 'onClick' },
+                data: { 
+                    name: 'onClick' 
+                },
             },
             {
                 id: `node_data_0_${initTime}`,
                 type: 'data',
                 position: { x: 100, y: 100 },
-                data: { label: 'Numbers', contents: { a: 1, b: 2 } },
+                data: { 
+                    name: 'Numbers', 
+                    requires: [],
+                    resolver: {
+                        name: "data", 
+                        params: {
+                            in: { a: 2 }
+                        }, 
+                        results: { out: "a" }
+                    },
+                    provides: ["a"],
+                },
+            },
+            {
+                id: `node_data_0_${initTime}`,
+                type: 'data',
+                position: { x: 100, y: 100 },
+                data: { 
+                    name: 'Numbers', 
+                    requires: [],
+                    resolver: {
+                        name: "data", 
+                        params: {
+                            in: { b: 1 }
+                        }, 
+                        results: { out: "b" }
+                    },
+                    provides: ["b"],
+                },
             },
             {
                 id: `node_component_0_${initTime}`,
                 type: 'component',
                 position: { x: 250, y: 200 },
-                // cool thought: amount of Handles is determined by how many arguments / returns are present in component function data
-                // this would make it possible to quickly switch to a variation of a functions logic etc
-                // though might get weird if people try to call a function node in a circular fashion
-                // that's a case that needs to be handled.
                 data: { 
                     name: "Math Thing",
+                    requires: ["a", "b"],
                     resolver: { 
                         name: "mathThing", 
+                        // params could be configurable component-specific values that don't come from data?
                         params: {}, 
-                        arguments: ["a", "b"], 
                         function: "return a+b;"
                     },
                     provides: ["c"]

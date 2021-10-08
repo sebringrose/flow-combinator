@@ -32,11 +32,11 @@ const TriggerNode = memo(({ data, isConnectable }) => html`<${React.Fragment}>
 </${React.Fragment}>`);
 
 const ComponentNode = memo(({ id, data, isConnectable }) => html`<${React.Fragment}>
-    ${data.resolver.arguments.map((arg, i) =>  html`<${Handle}
+    ${data.requires && data.requires.map((arg, i) =>  html`<${Handle}
         id=${`${id}_${arg}`}
         type="target"
         isConnectable=${isConnectable}
-        style=${{ left: `${(100/(data.resolver.arguments.length+1)) * (i+1)}%` }}
+        style=${{ left: `${(100/(data.requires.length+1)) * (i+1)}%` }}
     >
         ${arg}
     </${Handle}>`)}
@@ -45,7 +45,7 @@ const ComponentNode = memo(({ id, data, isConnectable }) => html`<${React.Fragme
         <h5>Component</h5>
         <p>${data.name}</p>
     </div>
-    ${data.provides.map((providedVar, i) => html`<${Handle}
+    ${data.provides && data.provides.map((providedVar, i) => html`<${Handle}
         type="source"
         position="bottom"
         isConnectable=${isConnectable}

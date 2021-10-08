@@ -14,22 +14,22 @@ export const onConnectUpdateFlows = (selectedElement, elements, flows, setFlows)
 
         // check and push target el
         if (
-            el.type === "component" && 
+            (el.type === "component" || el.type === "data") && 
             components.findIndex(cmpnt => cmpnt.el.id === el.id) < 0
-        ) components.push({ el, incomers, outgoers, sorter });
+        ) components.push({ el, sorter });
 
         // get neighbours and call fcn for them, 
         // increment or decrement sorter for ordering of components
         incomers.forEach(incomer => {
             if (
-                incomer.type === "component" && 
+                (incomer.type === "component" || el.type === "data") && 
                 components.findIndex(cmpnt => cmpnt.el.id === incomer.id) < 0
             ) recursivelyPushComponents(incomer, sorter-1);
         });
 
         outgoers.forEach(outgoer => {
             if (
-                outgoer.type === "component" && 
+                (outgoer.type === "component" || el.type === "data") && 
                 components.findIndex(cmpnt => cmpnt.el.id === outgoer.id) < 0
             ) recursivelyPushComponents(outgoer, sorter+1);
         });
@@ -51,12 +51,20 @@ export const onConnectUpdateFlows = (selectedElement, elements, flows, setFlows)
         // this will need to use previous component & inbound elements to figure out what the "requires" array will contain
         // and which input is each require, also input nodes will have to have have there data written in params?
         tasks[cmpnt.el.id] = {
-            requires: "this will be calc'ed from inputs",
+            // 
+            requires: cmpnt.el.data.requires.map(require => `${cmpnt.el.id}_${require}`),
             // resolver contains function data in string form. Will need to be decoded before flow execution
-            resolver: cmpnt.el.data.resolver,
-            provides: cmpnt.el.data.provides,
+            resolver: {
+                ...cmpnt.el.data.resolver,
+                results: {
+                    out: `${cmpnt.el.id}_${cmpnt.el.data.resolver.results.out}` 
+                },
+            },
+            provides: cmpnt.el.data.provides.map(provides => `${cmpnt.el.id}_${provides}`),
         };
     });
+
+    // here we need to create classes for each resolver (or use the data class if data) and append classes to tasks obj
 
     // push result into flows array state var/update if flow already exists
     setFlows(flows => {
